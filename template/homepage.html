@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <link href='https://fonts.googleapis.com/css?family=Lora' rel='stylesheet' type='text/css'>
+    <title>trig</title>
+    <link rel="stylesheet" href="../static/trolley.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.10.2/paper-full.min.js"></script>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <script type="text/paperscript" canvas="canvas">
+        var count = 80;
+
+        //main iterator
+        var offset = 0;
+        var mousePos = view.center;
+        var scale = view.viewSize.width/5;
+        var speed = 1.1;
+
+        //need to get mouse position on load
+        var x_center = 1;
+        var y_center = 1;
+
+        var ball_radius = view.viewSize.width/150;
+        var colors = ['#46BCDE','#52D273','#E94F64','#E5C454','white']
+        var mouse_dampener = 10000;
+
+        function onResize(event) {
+            console.log(view.viewSize.width/5);
+            draw(offset);
+        }
+
+        function onMouseMove(event) {
+            mousePos = event.point;
+            x_center += Math.abs(mousePos.x - view.center.x)/mouse_dampener;
+            y_center += Math.abs(mousePos.y - view.center.y)/mouse_dampener;
+        }
+
+        // Create a symbol, which we will use to place instances of later:
+        var path = new Path.Circle({
+            center: [0, 0],
+            radius: ball_radius,
+            fillColor: colors[2]
+        });
+
+        var path1 = new Path.Circle({
+            center: [0, 0],
+            radius: ball_radius,
+            fillColor: colors[0]
+        });
+        var path2 = new Path.Circle({
+            center: [0, 0],
+            radius: ball_radius,
+            fillColor: colors[3]
+        });
+        var paths = [path, path1, path2];
+        function draw(offset){
+            for (var i = 0; i < count; i++) {
+                var symbol = new Symbol(paths[Math.floor(3*i/count)]);
+                var xcoord = Math.cos(i/speed*x_center+offset)*scale+view.center.x;
+                var ycoord = Math.cos(i*(speed*y_center)+offset)*scale+view.center.y;
+                var center = [xcoord, ycoord];
+                var placedSymbol = symbol.place(center);
+            }
+        }
+        function clear(){
+            project.activeLayer.removeChildren();
+        }
+        function onFrame(event) {
+            draw(offset);
+            setInterval(clear,20);
+            onResize;
+            offset += .01;    
+        }
+    </script>
+
+  </body>
+</html>
